@@ -53,7 +53,7 @@ public class MainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         timeStateLabel.setMaxWidth(Double.MAX_VALUE);
         timeStateLabel.setText("Состояние времени: " + timeServer.getState() + " сек (неактивен)");
-        timeServer.attach(() -> updateTimeLabel());
+        timeServer.attach(this::updateTimeLabel);
 
         ComponentOne componentOne = new ComponentOne(timeServer, componentOneTimeLabel);
         ComponentTwo componentTwo = new ComponentTwo(timeServer, delayField, mediaView, placeholderLabel, statusLabel);
