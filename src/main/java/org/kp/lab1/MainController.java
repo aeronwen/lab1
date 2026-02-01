@@ -1,7 +1,5 @@
 package org.kp.lab1;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -9,15 +7,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.media.MediaView;
 
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 
 /**
  * Контроллер главного окна приложения (main-view.fxml).
- *
  * Вся разметка интерфейса описана в одном FXML-файле. При инициализации создаёт
  * TimeServer (передаётся из MainApp), подписывает метку состояния времени на обновления,
  * создаёт три компонента-наблюдателя (ComponentOne, ComponentTwo, ComponentThree),
@@ -48,14 +43,6 @@ public class MainController implements Initializable {
     @FXML
     private TextField delayField;
 
-    /** MediaView для аудио в компоненте 2. */
-    @FXML
-    private MediaView mediaView;
-
-    /** Метка-заглушка / ошибка загрузки MP3 в компоненте 2. */
-    @FXML
-    private Label placeholderLabel;
-
     /** Метка "Сейчас: играет" / "Сейчас: тишина" в компоненте 2. */
     @FXML
     private Label statusLabel;
@@ -80,6 +67,11 @@ public class MainController implements Initializable {
     @FXML
     private Button buttonOff;
 
+    /** Компоненты-наблюдатели (создаются в initialize(), нужны для обработчиков кнопок). */
+    private ComponentOne componentOne;
+    private ComponentTwo componentTwo;
+    private ComponentThree componentThree;
+
     public MainController(TimeServer timeServer) {
         this.timeServer = timeServer;
     }
@@ -95,42 +87,42 @@ public class MainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         timeStateLabel.setMaxWidth(Double.MAX_VALUE);
         timeStateLabel.setText("Состояние времени: " + timeServer.getState() + " сек (неактивен)");
-        timeServer.attach(this::updateTimeLabel);
+        timeServer.attach(new IObserver() {
+            @Override
+            public void update() {
+                updateTimeLabel();
+            }
+        });
 
-        ComponentOne componentOne = new ComponentOne(timeServer, componentOneTimeLabel);
-        ComponentTwo componentTwo = new ComponentTwo(timeServer, delayField, mediaView, placeholderLabel, statusLabel);
-        ComponentThree componentThree = new ComponentThree(timeServer, shapePane);
+        componentOne = new ComponentOne(timeServer, componentOneTimeLabel);
+        componentTwo = new ComponentTwo(timeServer, delayField, statusLabel);
+        componentThree = new ComponentThree(timeServer, shapePane);
 
         componentTwo.init();
 
-        buttonPlay.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                componentTwo.start();
-            }
-        });
-        buttonStop.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                componentTwo.stop();
-            }
-        });
-        buttonOn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                componentThree.onOn();
-            }
-        });
-        buttonOff.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                componentThree.onOff();
-            }
-        });
+        timeServer.attach(componentOne);
+        timeServer.attach(componentTwo);
+        timeServer.attach(componentThree);
+    }
 
-        for (IObserver observer : List.of(componentOne, componentTwo, componentThree)) {
-            timeServer.attach(observer);
-        }
+    @FXML
+    private void onButtonPlay() {
+        componentTwo.start();
+    }
+
+    @FXML
+    private void onButtonStop() {
+        componentTwo.stop();
+    }
+
+    @FXML
+    private void onButtonOn() {
+        componentThree.onOn();
+    }
+
+    @FXML
+    private void onButtonOff() {
+        componentThree.onOff();
     }
 
     /**

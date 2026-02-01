@@ -13,11 +13,9 @@ import java.util.List;
 
 /**
  * Компонент 3 — третий наблюдатель (IObserver).
- *
  * Отображает фигуру в зависимости от (state % 10): 0 — пусто, 1 — точка (маленький круг),
  * 2 — горизонтальная линия, 3 и больше — правильный многоугольник с соответствующим числом углов.
  * Кнопки "Вкл" и "Выкл": onOn() — подписка и включение отображения, onOff() — отписка.
- *
  * Разметка (Pane для фигуры и кнопки) в main-view.fxml; ссылка на Pane передаётся из MainController.
  */
 public class ComponentThree implements IObserver {
@@ -101,7 +99,8 @@ public class ComponentThree implements IObserver {
 
     /**
      * Вызывается Subject каждую секунду, пока компонент подписан. По getState() % 10
-     * определяется тип фигуры; shapePane очищается и в него добавляется новая фигура.
+     * определяется тип фигуры (0 — пусто, 1 — точка, 2 — линия, 3+ — многоугольник).
+     * Отрисовка выполняется в потоке JavaFX (Platform.runLater).
      */
     @Override
     public void update() {
@@ -109,7 +108,9 @@ public class ComponentThree implements IObserver {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                // Если отображение выключено — не рисуем
                 if (!enabled) return;
+                // n = 0..9: 0 — пусто, 1 — точка, 2 — линия, 3+ — многоугольник с n углами
                 int n = subject.getState() % 10;
                 shapePane.getChildren().clear();
                 Shape shape = ComponentThree.this.shapeFor(n);

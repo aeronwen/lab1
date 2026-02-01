@@ -8,7 +8,6 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.media.MediaView?>
 
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.kp.lab1.MainController"
@@ -40,12 +39,10 @@
             <Label text="Компонент 2"/>
             <Label text="Пауза (сек):"/>
             <TextField fx:id="delayField" promptText="Пауза (сек)" text="10" prefColumnCount="4"/>
-            <MediaView fx:id="mediaView" fitWidth="120" fitHeight="70"/>
-            <Label fx:id="placeholderLabel" text="Добавьте audio/sample.mp3"/>
             <Label fx:id="statusLabel" text="Сейчас: тишина"/>
             <HBox spacing="4">
-                <Button fx:id="buttonPlay" text="Вкл"/>
-                <Button fx:id="buttonStop" text="Выкл"/>
+                <Button fx:id="buttonPlay" text="Вкл" onAction="#onButtonPlay"/>
+                <Button fx:id="buttonStop" text="Выкл" onAction="#onButtonStop"/>
             </HBox>
         </VBox>
         <Separator/>
@@ -57,8 +54,8 @@
             <Label text="0 — пусто, 1 — точка, 2 — линия, 3+ — углы"/>
             <Pane fx:id="shapePane" minWidth="80" minHeight="80" prefWidth="80" prefHeight="80"/>
             <HBox spacing="4">
-                <Button fx:id="buttonOn" text="Вкл"/>
-                <Button fx:id="buttonOff" text="Выкл"/>
+                <Button fx:id="buttonOn" text="Вкл" onAction="#onButtonOn"/>
+                <Button fx:id="buttonOff" text="Выкл" onAction="#onButtonOff"/>
             </HBox>
         </VBox>
     </VBox>
