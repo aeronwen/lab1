@@ -8,9 +8,19 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-/** Точка входа. Окно 800×600. */
+/**
+ * Точка входа приложения (класс с main).
+ *
+ * Создаёт экземпляр TimeServer, загружает main-view.fxml и подставляет MainController
+ * с передачей timeServer (через setControllerFactory). Окно 800×600, заголовок "lab1".
+ */
 public class MainApp extends Application {
 
+    /**
+     * Создаёт TimeServer, загружает разметку из /org/kp/lab1/main-view.fxml,
+     * задаёт фабрику контроллера так, чтобы MainController получал timeServer в конструкторе,
+     * создаёт сцену и отображает окно.
+     */
     @Override
     public void start(Stage stage) throws IOException {
         TimeServer timeServer = new TimeServer();

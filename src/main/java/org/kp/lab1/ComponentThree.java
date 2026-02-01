@@ -12,25 +12,48 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Компонент 3 — наблюдатель. Форма по state % 10: 0 — пусто, 1 — точка, 2 — линия, 3+ — многоугольник. Разметка в main-view.fxml.
+ * Компонент 3 — третий наблюдатель (IObserver).
+ *
+ * Отображает фигуру в зависимости от (state % 10): 0 — пусто, 1 — точка (маленький круг),
+ * 2 — горизонтальная линия, 3 и больше — правильный многоугольник с соответствующим числом углов.
+ * Кнопки "Вкл" и "Выкл": onOn() — подписка и включение отображения, onOff() — отписка.
+ *
+ * Разметка (Pane для фигуры и кнопки) в main-view.fxml; ссылка на Pane передаётся из MainController.
  */
 public class ComponentThree implements IObserver {
 
+    /** Координаты центра фигуры и радиус описанной окружности для многоугольника/линии. */
     private static final double CENTER_X = 40;
     private static final double CENTER_Y = 40;
     private static final double RADIUS = 35;
+
+    /** Цвет фигуры (точка, линия, многоугольник). */
     private static final Color SHAPE_COLOR = Color.BLACK;
 
+    /** Субъект времени — getState() даёт текущую секунду, state % 10 определяет тип фигуры. */
     private final Subject subject;
+
+    /** Контейнер, в котором рисуется фигура (очищается и заполняется заново при каждом update()). */
     private final Pane shapePane;
+
+    /** Включено ли отображение фигуры (false после "Выкл", снова true после "Вкл"). */
     private boolean enabled = true;
+
+    /** Подписан ли компонент на Subject (false после "Выкл", true после "Вкл"). */
     private boolean attached = true;
 
+    /**
+     * @param subject субъект времени (TimeServer)
+     * @param shapePane контейнер из main-view.fxml (fx:id="shapePane")
+     */
     public ComponentThree(Subject subject, Pane shapePane) {
         this.subject = subject;
         this.shapePane = shapePane;
     }
 
+    /**
+     * Включить отображение и при необходимости подписаться на Subject. Вызывается по кнопке "Вкл".
+     */
     public void onOn() {
         if (!attached) {
             subject.attach(this);
@@ -40,11 +63,17 @@ public class ComponentThree implements IObserver {
         update();
     }
 
+    /**
+     * Отписаться от Subject (фигура перестаёт обновляться). Вызывается по кнопке "Выкл".
+     */
     public void onOff() {
         subject.detach(this);
         attached = false;
     }
 
+    /**
+     * Создаёт фигуру для значения n = state % 10: 0 — null (ничего), 1 — точка, 2 — линия, 3+ — многоугольник с n углами.
+     */
     private Shape shapeFor(int n) {
         if (n == 0) return null;
         if (n == 1) {
@@ -70,15 +99,22 @@ public class ComponentThree implements IObserver {
         return polygon;
     }
 
+    /**
+     * Вызывается Subject каждую секунду, пока компонент подписан. По getState() % 10
+     * определяется тип фигуры; shapePane очищается и в него добавляется новая фигура.
+     */
     @Override
     public void update() {
         if (!attached) return;
-        Platform.runLater(() -> {
-            if (!enabled) return;
-            int n = subject.getState() % 10;
-            shapePane.getChildren().clear();
-            Shape shape = shapeFor(n);
-            if (shape != null) shapePane.getChildren().add(shape);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                if (!enabled) return;
+                int n = subject.getState() % 10;
+                shapePane.getChildren().clear();
+                Shape shape = ComponentThree.this.shapeFor(n);
+                if (shape != null) shapePane.getChildren().add(shape);
+            }
         });
     }
 }

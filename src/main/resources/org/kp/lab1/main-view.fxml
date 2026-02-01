@@ -44,8 +44,8 @@
             <Label fx:id="placeholderLabel" text="Добавьте audio/sample.mp3"/>
             <Label fx:id="statusLabel" text="Сейчас: тишина"/>
             <HBox spacing="4">
-                <Button fx:id="buttonPlay" text="Воспроизвести"/>
-                <Button fx:id="buttonStop" text="Стоп"/>
+                <Button fx:id="buttonPlay" text="Вкл"/>
+                <Button fx:id="buttonStop" text="Выкл"/>
             </HBox>
         </VBox>
         <Separator/>
